@@ -1,0 +1,11 @@
+node_modules/ 
+.next/ 
+*.pyc 
+__pycache__/ 
+db.sqlite3 
+media/ 
+staticfiles/ 
+*.env 
+.vscode/ 
+.DS_Store 
+*.log 
