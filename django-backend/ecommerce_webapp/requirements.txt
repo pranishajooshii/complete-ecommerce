@@ -4,3 +4,4 @@ djangorestframework
 django-cors-headers
 django-mptt
 django-filter
+Pillow
