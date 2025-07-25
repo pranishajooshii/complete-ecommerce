@@ -28,3 +28,28 @@ class CategorySerializer(serializers.ModelSerializer):
     )
     
      return child_serializer.data
+
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all()
+    )
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'price', 'category', 'stock', 'available']
+        read_only_fields = ['slug']
+
+    def validate(self, data):
+     price = data.get('price')
+     if price is not None and price <= 0:
+        raise serializers.ValidationError({"price": "Price must be greater than zero."})
+     return data
+
+    
+   
+    
+
+    
+    
