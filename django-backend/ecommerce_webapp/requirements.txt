@@ -1,6 +1,6 @@
 Django>=4.2
 psycopg2-binary>=2.9
 djangorestframework
-djangorestframework-authtoken
-
 django-cors-headers
+django-mptt
+django-filter
