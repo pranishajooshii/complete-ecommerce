@@ -11,20 +11,23 @@ class CategorySerializer(serializers.ModelSerializer):
     
     def get_children(self, obj):
     # Get the depth limit from context (default: 1 level)
-     depth_limit = self.context.get('depth', 1)
+     depth_limit = int(self.context.get('depth', 2))
     
     # If we've reached maximum depth, return empty list
      if depth_limit <= 0:
         return []
     
     # Get immediate children
-     immediate_children = obj.children.all()  
+     immediate_children = obj.children.all() 
+
+     if not immediate_children.exists():
+        return [] 
     
     # Serialize them with reduced depth
      child_serializer = CategorySerializer(
         immediate_children,
         many=True,
-        context={'depth': depth_limit - 1}  # Decrease depth for next level
+        context={**self.context, 'depth': depth_limit - 1}  # Decrease depth for next level
     )
     
      return child_serializer.data
@@ -47,7 +50,11 @@ class ProductSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError({"price": "Price must be greater than zero."})
      return data
 
-    
+    def validate_category(self,category):
+       if category.children.exists():
+        raise serializers.ValidationError("Choose a leaf category.")
+          
+       
    
     
 
