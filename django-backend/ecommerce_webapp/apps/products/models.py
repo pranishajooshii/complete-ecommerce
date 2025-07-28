@@ -67,3 +67,15 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"Image for {self.product.name}" if self.product else "Image without product"
 
+    def save(self,*args, **kwargs):
+
+        if self.is_main:
+            ProductImage.objects.filter(
+                product=self.product,
+                is_main=True
+
+            ).update(is_main=False)
+            super().save(*args, **kwargs)
+
+        class Meta:
+            ordering=['is_main','created_at']

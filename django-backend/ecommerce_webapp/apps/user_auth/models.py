@@ -47,9 +47,7 @@ class CustomUser(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     
-    
 
-       # Specify unique related_name for groups and user_permissions
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',

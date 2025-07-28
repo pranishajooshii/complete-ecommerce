@@ -9,6 +9,8 @@ from django.utils.text import slugify
 from .filters import ProductFilterBackend
 from .search import ProductSearchFilter
 from rest_framework.decorators import action
+from rest_framework import generics
+
 
 # Create your views here.
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -18,8 +20,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly] 
     filter_backends = [ProductFilterBackend, ProductSearchFilter]  
 
-
-    
     
     def get_queryset(self):
       queryset = Category.objects.all().select_related('parent')  # Optimize parent fetching
@@ -34,7 +34,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         request=self.request
-        context['depth'] = request.query_params.get('depth', 1)
+        context['depth'] = request.query_params.get('depth', 2)
         return context
     
     def destroy(self, request, *args, **kwargs):
@@ -57,18 +57,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
      print(f"Category: {category}")
 
      descendants = category.get_descendants(include_self=True)  # fix typo here
-     products = Product.objects.filter(category__in=descendants)
+     products = Product.objects.filter(category__in=descendants).prefetch_related('images')
 
      if products.exists():
-        serializer = ProductSerializer(products, many=True)
+        serializer = ProductSerializer(products, many=True, context={"request":request})
         return Response(serializer.data, status=status.HTTP_200_OK)
      else:
         return Response({"detail": "No products found"}, status=status.HTTP_404_NOT_FOUND)
  
-
-
-
-
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -92,4 +88,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
-  
+class ProductDetailView(generics.RetrieveAPIView):
+    queryset = Product.objects.prefetch_related('images')
+    serializer_class = ProductSerializer
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context

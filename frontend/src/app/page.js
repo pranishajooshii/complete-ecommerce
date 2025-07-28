@@ -11,7 +11,6 @@ const Homepage = () => {
     <>
       <Slider />
       <Collections/>
-      <ListPage/>
       <NewsLetter/>
     </>
   );
