@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Category,Product, ProductImage
-from .serializers import CategorySerializer, ProductSerializer
+from .serializers import CategorySerializer, ProductSerializer, ProductDetailSerializer
 from rest_framework.permissions import  IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
@@ -68,13 +68,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     lookup_field = 'slug'  
     filter_backends = [ProductFilterBackend, ProductSearchFilter]  
     
     def get_queryset(self):
         return Product.objects.filter(available=True).select_related('category')
+    
+    def get_serializer_class(self):
+       if self.action=='retrieve':
+          return ProductDetailSerializer
+       return ProductSerializer
+    
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
@@ -88,11 +93,3 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
-class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.prefetch_related('images')
-    serializer_class = ProductSerializer
-    
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['request'] = self.request
-        return context

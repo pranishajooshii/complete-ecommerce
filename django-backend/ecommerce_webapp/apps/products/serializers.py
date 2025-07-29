@@ -48,12 +48,13 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all()
     )
-    images = ProductImageSerializer(many=True, read_only=True)  
+    images = ProductImageSerializer(many=True, read_only=True) 
+    description=serializers.CharField(write_only=True, required=False) 
    
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'category', 'stock', 'available','images']
+        fields = ['id', 'name', 'price', 'category', 'available','images','description']
         read_only_fields = ['slug']
 
     def validate(self, data):
@@ -67,6 +68,11 @@ class ProductSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError("Choose a leaf category.")
           
        
+class ProductDetailSerializer(serializers.ModelSerializer):
+   images = ProductImageSerializer(many=True, read_only=True)  
+   class Meta:
+      model=Product
+      fields = ['id', 'name', 'description', 'price', 'category', 'stock', 'available','images']
 
       
     

@@ -31,6 +31,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'user_auth.CustomUser'
 
+TIME_ZONE = 'Asia/Kathmandu'
+USE_TZ = True
 
 # Application definition
 
@@ -46,7 +48,8 @@ INSTALLED_APPS = [
     'apps.user_auth',
      'mptt',
     'apps.products',
-    'corsheaders' 
+    'corsheaders' ,
+    'apps.carts',
     ]
 
 MIDDLEWARE = [
@@ -126,11 +129,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
